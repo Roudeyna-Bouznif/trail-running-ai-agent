@@ -30,40 +30,6 @@ Every day, this agent automatically:
 
 ---
 
-## 📊 Google Sheets Structure
-
-Your sheet should have these columns:
-
-| Name | Miles | Elevation | Estimated Time | Shade Level |
-|------|-------|-----------|----------------|-------------|
-| Trail Name | 5.4 | 1023 | 1h 20m | Shady / Some Shade / Exposed |
-
----
-
-## ⚙️ How to Set It Up
-
-### 1. Clone the workflow
-- Download `workflow.json` from this repo
-- Import it into your n8n instance: **Menu → Import from file**
-
-### 2. Configure credentials
-You need to add the following credentials in n8n:
-
-- **Groq API Key** — get it free at [console.groq.com](https://console.groq.com)
-- **OpenWeatherMap API Key** — get it free at [openweathermap.org](https://openweathermap.org/api)
-- **Google OAuth2** — for Gmail and Google Calendar
-- **Google Sheets OAuth2** — for reading your trail list
-
-### 3. Set your city
-In the **OpenWeatherMap** node, set the **City** field to your city (e.g. `Tunis`).
-
-### 4. Set up your Google Sheet
-Create a Google Sheet with the structure above and link it in the **Google Sheets** node.
-
-### 5. Schedule it
-The **Schedule Trigger** runs the workflow automatically every day. You can configure the time in the trigger settings.
-
----
 
 ## 📧 Example Output
 
@@ -82,22 +48,9 @@ Reason: This trail fits your schedule and matches today's weather conditions.
 
 ---
 
-## ⚠️ Important Notes
 
-- This workflow uses **free tiers only** — no paid subscriptions needed
-- Groq has a rate limit of ~30 requests/minute on the free tier
-- OpenWeatherMap free tier allows 1,000 API calls/day
-- Never commit your API keys to GitHub — n8n does not export credentials in the JSON file
 
----
 
-## 📁 Files
-
-```
-├── README.md          # This file
-├── workflow.json      # n8n workflow (export from n8n)
-└── trails.xlsx        # Sample trail list for Google Sheets
-```
 
 ---
 
