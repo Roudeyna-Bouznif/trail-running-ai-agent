@@ -1,0 +1,296 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "9b942190-d432-4e09-abea-ed3d253f19ce",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Role:\nYou are a smart, weather-aware trail running assistant. \nYou help me decide whether I should go for a trail run today.\n\nTask:\nDecide if I should go for a trail run today. If so, recommend \nthe best trail based on time, weather, and air quality.\n\nInput:\nYou have access to the following:\n- My calendar via the OpenWeatherMap tool. You're looking for \n  an event titled \"Trail Run\" scheduled today.\n- The current weather via the OpenWeatherMap tool.\n- Current air quality (PM2.5-based AQI) via the OpenWeatherMap tool.\n- A list of trail runs from the Google Sheets tool. \n  Each trail includes:\n    - Name\n    - Distance (miles)\n    - Elevation gain (feet)\n    - Estimated time\n    - Shade Level: \"Shady\", \"Some Shade\", or \"Exposed\"\n\nTools:\nUse only these tools to perform your reasoning and take action:\n- Google Calendar: Returns today's events.\n- OpenWeatherMap: Returns temperature, conditions, and air quality.\n- Google Sheets: Returns a list of trails with the fields above.\n- Gmail: Sends the final recommendation or status message.\n\nConstraints:\n- First, use Google Calendar. If there is no event titled \n  \"Trail Run\" today, do nothing.\n- Next, use OpenWeatherMap to check air quality. If the category \n  is \"Unhealthy\", \"Very Unhealthy\", or \"Hazardous\", do not recommend \n  any trail and send a message explaining why.\n- If air quality is \"Good\" or \"Moderate\", continue.\n- Use OpenWeatherMap for weather. If it's very hot or sunny, \n  avoid trails marked \"Exposed\" and prefer \"Shady\" or \"Some Shade\".\n- Use Google Sheets and choose one trail that:\n    - Fits within the estimated time range\n    - Matches today's weather and shade needs\nUse Gmail to send an email with the following content:\n\nSubject: 🏃 Trail Run Recommendation for Today\n\nBody:\n- 🌤️ Weather: [temperature, conditions]\n- 💨 Air Quality: [AQI category]\n- 🏔️ Recommended Trail: [trail name]\n- 📏 Distance: [miles] miles\n- ⛰️ Elevation: [feet] feet\n- ⏱️ Estimated Time: [time]\n- 🌿 Shade Level: [shade level]\n- 💡 Reason: [why this trail is recommended today]\n\nIf no trail is appropriate today, explain clearly why.",
+        "options": {
+          "systemMessage": "You are a helpful assistant\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        352,
+        -16
+      ],
+      "id": "c81f1f9c-b96e-4f83-944e-53a4fea045c1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=default\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        224
+      ],
+      "id": "6856e918-abbd-4a52-8786-6ab2751f1dd2",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        144,
+        224
+      ],
+      "id": "c3681abe-4bf5-4684-b63e-ff4b90fd25c2",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "pq6rQVU5rZ7IoJ8H",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "roudeyna.bouznif@enicar.ucar.tn",
+          "mode": "list",
+          "cachedResultName": "roudeyna.bouznif@enicar.ucar.tn"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        224
+      ],
+      "id": "df768063-2ae6-40af-bd26-368458e7475a",
+      "name": "Create an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "YTfSWB1Az2ChGSxI",
+          "name": "Google Calendar account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "format": "imperial",
+        "cityName": "Tunis",
+        "language": "en"
+      },
+      "type": "n8n-nodes-base.openWeatherMapTool",
+      "typeVersion": 1,
+      "position": [
+        528,
+        224
+      ],
+      "id": "80cc589b-4313-4fb7-a640-089c5cf5a7e2",
+      "name": "OpenWeatherMap",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "m6j90kpLxhgDsXC9",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1GV5a60TiUZ-LaLYUlqDyl7eTe2L_ajU7idnkcllj7zs",
+          "mode": "list",
+          "cachedResultName": "trails",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GV5a60TiUZ-LaLYUlqDyl7eTe2L_ajU7idnkcllj7zs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 655970692,
+          "mode": "list",
+          "cachedResultName": "Runs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1GV5a60TiUZ-LaLYUlqDyl7eTe2L_ajU7idnkcllj7zs/edit#gid=655970692"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        656,
+        224
+      ],
+      "id": "9d12ddf0-b871-4c2e-bbee-71bd907bfd03",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZkByWXPBi1VW2xWM",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "roudeyna.bouznif@enicar.ucar.tn",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        224
+      ],
+      "id": "7c88b29d-abcf-4b58-bd37-67092a056a2b",
+      "name": "Send a message in Gmail",
+      "webhookId": "a610089a-7fa5-4923-861f-a6ff6ee5e01f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "R7P3k1yDwucU1x1f",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Makes an HTTP request and returns the air quality data",
+        "url": "https://www.airnowapi.org/aq/observation/zipCode/current/?format=application/json&zipCode=84020&distance=25&API_KEY=8D4B3AE7-97F9-4A01-B660-2952542C0A77",
+        "options": {},
+        "optimizeResponse": true
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        912,
+        224
+      ],
+      "id": "82b703e4-cc5c-45ec-84ad-8857ebe5115a",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ef75eac8-204e-4fc7-be53-3236cdaf6acc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "182f0bc2443c0e5c99b824694b6869fa673eff0696a4bd5e1e558261f2640219"
+  },
+  "id": "WyUVG9PQoUdd4uKw",
+  "tags": []
+}
